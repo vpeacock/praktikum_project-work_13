@@ -1,0 +1,22 @@
+{
+  "name": "project_work_12",
+  "version": "0.0.1",
+  "description": "12 project work in Yandex Workshop",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js",
+    "eslint": "eslint"
+  },
+  "author": "Altukhova Valentina <mariaiscus1@gmail.com>",
+  "license": "ISC",
+  "devDependencies": {
+    "eslint": "^7.5.0",
+    "nodemon": "^2.0.4",
+    "eslint-config-airbnb-base": "^14.2.0",
+    "eslint-plugin-import": "^2.22.0"
+  },
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
