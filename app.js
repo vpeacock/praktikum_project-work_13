@@ -1,18 +1,37 @@
 const express = require('express');
+const mongoose = require('mongoose');
+const bodyParser = require('body-parser');
+const routerCards = require('./routes/cards');
+const routerUsers = require('./routes/users');
+const config = require('./config.js');
 
-const { PORT = 3000 } = process.env;
 const app = express();
-const path = require('path');
-const cardsRouter = require('./routes/cards');
-const usersRouter = require('./routes/users');
 
-app.use(express.static(path.join(__dirname, 'public')));
-app.use('/cards', cardsRouter);
-app.use('/users', usersRouter);
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
+mongoose.connect(config.DATABASE_URL, {
+  useNewUrlParser: true,
+  useCreateIndex: true,
+  useFindAndModify: false,
+  useUnifiedTopology: true,
+});
+
+app.use((req, res, next) => {
+  req.user = {
+    _id: '5f326edff4fd1c20a8c5efb6',
+  };
+
+  next();
+});
+
+app.use('/cards', routerCards);
+app.use('/users', routerUsers);
+
 app.use('/', (req, res) => {
   res.status(404).send({ message: 'Запрашиваемый ресурс не найден' });
 });
-app.listen(PORT, () => {
-  // Если всё работает, консоль покажет, какой порт приложение слушает
-  console.log(`App listening on port ${PORT}`);
+
+app.listen(config.PORT, () => {
+  console.log(`App listening on port ${config.PORT}`);
 });
