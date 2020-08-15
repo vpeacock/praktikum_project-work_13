@@ -7,7 +7,8 @@ module.exports.getUsers = (req, res) => {
 };
 
 module.exports.getUserId = (req, res) => {
-  User.findById(req.params.id)
+  const { userId } = req.params;
+  User.findById(userId)
     .orFail(() => {
       res.status(404).send({ message: 'Пользователя с таким id не существует' });
     })
