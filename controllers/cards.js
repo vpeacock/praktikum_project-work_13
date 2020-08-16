@@ -14,21 +14,23 @@ module.exports.createCard = (req, res) => {
     .then((card) => res.send({ data: card }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.send({ message: 'Данные не прошли валидацию' });
-      } else res.status(500).send({ message: err.message });
+        res.status(400).send({ message: 'Данные не прошли валидацию' });
+        return;
+      }
+      res.status(500).send({ message: err.message });
     });
 };
 
 module.exports.deleteCard = (req, res) => {
   const { cardId } = req.params;
-  Card.findById(cardId)
-    .orFail(() => {
-      res.status(404).send({ message: 'Карточки с таким id не существует' });
-    })
+  Card.findByIdAndRemove(cardId)
     .then((card) => {
-      card.remove();
+      if (!card) {
+        res.status(404).send({ message: 'Карточки с таким id не существует' });
+        return;
+      }
+      res.send({ data: card });
     })
-    .then(res.send({ message: 'Карточки с таким id была удалена' }))
     .catch((err) => res.status(500).send({ message: err.message }));
 };
 
@@ -40,10 +42,14 @@ module.exports.likeCard = (req, res) => {
     { $addToSet: { likes: req.user._id } },
     { new: true },
   )
-    .orFail(() => {
-      res.status(404).send({ message: 'Карточки с таким id не существует' });
+    .populate('likes')
+    .then((card) => {
+      if (!card) {
+        res.status(404).send({ message: 'Карточка с таким id не найдена' });
+        return;
+      }
+      res.send({ data: card });
     })
-    .then((card) => res.send({ data: card }))
     .catch((err) => res.status(500).send({ message: err.message }));
 };
 
@@ -55,9 +61,13 @@ module.exports.dislikeCard = (req, res) => {
     { $pull: { likes: req.user._id } },
     { new: true },
   )
-    .orFail(() => {
-      res.status(404).send({ message: 'Карточки с таким id не существует' });
+    .populate('likes')
+    .then((card) => {
+      if (!card) {
+        res.status(404).send({ message: 'Карточка  с таким id не найдена' });
+        return;
+      }
+      res.send({ data: card });
     })
-    .then((card) => res.send({ data: card }))
     .catch((err) => res.status(500).send({ message: err.message }));
 };
