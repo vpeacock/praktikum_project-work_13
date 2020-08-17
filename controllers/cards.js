@@ -14,7 +14,7 @@ module.exports.createCard = (req, res) => {
     .then((card) => res.send({ data: card }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400).send({ message: 'Данные не прошли валидацию' });
+        res.status(400).send({ message: err.message });
         return;
       }
       res.status(500).send({ message: err.message });
@@ -31,7 +31,13 @@ module.exports.deleteCard = (req, res) => {
       }
       res.send({ data: card });
     })
-    .catch((err) => res.status(500).send({ message: err.message }));
+    .catch((err) => {
+      console.log(err.name);
+      if (err.name === 'CastError') {
+        res.status(400).send({ message: 'Некорректный формат ID' });
+        return;
+      } res.status(500).send({ message: err.message });
+    });
 };
 
 module.exports.likeCard = (req, res) => {
@@ -50,7 +56,13 @@ module.exports.likeCard = (req, res) => {
       }
       res.send({ data: card });
     })
-    .catch((err) => res.status(500).send({ message: err.message }));
+    .catch((err) => {
+      console.log(err.name);
+      if (err.name === 'CastError') {
+        res.status(400).send({ message: 'Некорректный формат ID' });
+        return;
+      } res.status(500).send({ message: err.message });
+    });
 };
 
 module.exports.dislikeCard = (req, res) => {
@@ -69,5 +81,11 @@ module.exports.dislikeCard = (req, res) => {
       }
       res.send({ data: card });
     })
-    .catch((err) => res.status(500).send({ message: err.message }));
+    .catch((err) => {
+      console.log(err.name);
+      if (err.name === 'CastError') {
+        res.status(400).send({ message: 'Некорректный формат ID' });
+        return;
+      } res.status(500).send({ message: err.message });
+    });
 };

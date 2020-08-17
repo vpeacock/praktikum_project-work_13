@@ -15,11 +15,19 @@ module.exports.getUsers = (req, res) => {
 module.exports.getUserId = (req, res) => {
   const { userId } = req.params;
   User.findById(userId)
-    .orFail(() => {
-      res.status(404).send({ message: 'Пользователя с таким id не существует' });
-    })
+    .orFail()
     .then((user) => res.send({ data: user }))
-    .catch((err) => res.status(500).send({ message: err.message }));
+    .catch((err) => {
+      if (err.name === 'DocumentNotFoundError') {
+        res.status(404).send({ message: 'Пользователя с таким id не существует' });
+        return;
+      } if (err.name === 'CastError') {
+        res.status(400).send({ message: 'Некорректный формат ID' });
+        return;
+      }
+
+      res.status(500).send({ message: err.message });
+    });
 };
 
 module.exports.createUser = (req, res) => {
@@ -30,7 +38,7 @@ module.exports.createUser = (req, res) => {
     .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400).send({ message: 'Данные не прошли валидацию' });
+        res.status(400).send({ message: err.message });
         return;
       }
       res.status(500).send({ message: err.message });
@@ -55,7 +63,7 @@ module.exports.updateUser = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400).send({ message: 'Данные не прошли валидацию' });
+        res.status(400).send({ message: err.message });
         return;
       }
       res.status(500).send({ message: err.message });
@@ -74,10 +82,15 @@ module.exports.updateAvatar = (req, res) => {
       runValidators: true,
     },
   )
-    .then((user) => res.send({ data: user }))
+    .then((user) => {
+      if (!user) {
+        res.status(404).send({ message: 'Пользователь не существует' });
+        return;
+      } res.send({ data: user });
+    })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400).send({ message: 'Данные не прошли валидацию' });
+        res.status(400).send({ message: err.message });
         return;
       }
       res.status(500).send({ message: err.message });
