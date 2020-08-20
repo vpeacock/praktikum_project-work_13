@@ -32,7 +32,6 @@ module.exports.deleteCard = (req, res) => {
       res.send({ data: card });
     })
     .catch((err) => {
-      console.log(err.name);
       if (err.name === 'CastError') {
         res.status(400).send({ message: 'Некорректный формат ID' });
         return;
@@ -57,7 +56,6 @@ module.exports.likeCard = (req, res) => {
       res.send({ data: card });
     })
     .catch((err) => {
-      console.log(err.name);
       if (err.name === 'CastError') {
         res.status(400).send({ message: 'Некорректный формат ID' });
         return;
@@ -82,7 +80,6 @@ module.exports.dislikeCard = (req, res) => {
       res.send({ data: card });
     })
     .catch((err) => {
-      console.log(err.name);
       if (err.name === 'CastError') {
         res.status(400).send({ message: 'Некорректный формат ID' });
         return;
